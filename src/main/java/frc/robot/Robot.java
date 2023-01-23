@@ -4,10 +4,10 @@
 
 package frc.robot;
 
-import frc.robot.Functions;
+import static frc.robot.Constants.*;
+import static frc.robot.Functions.*;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,8 +34,6 @@ public class Robot extends TimedRobot {
 
   private final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
-  private final Joystick controller = new Joystick(0);
-
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -45,6 +44,9 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    CameraServer.startAutomaticCapture();
+
   }
 
   /**
@@ -94,7 +96,16 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() 
+  {
+    if (controller.getRawButtonPressed(4)) {
+      testSolenoid.set(Value.kForward);
+    }
+    if (controller.getRawButtonPressed(2)) {
+      testSolenoid.set(Value.kReverse);
+    }
+    Teleop_Drive(0);
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -107,7 +118,6 @@ public class Robot extends TimedRobot {
   /** This function is called once when test mode is enabled. */
   @Override
   public void testInit() {
-    
 
   }
 
@@ -120,6 +130,7 @@ public class Robot extends TimedRobot {
     if (controller.getRawButtonPressed(2)) {
       testSolenoid.set(Value.kReverse);
     }
+    
   }
 
   /** This function is called once when the robot is first started up. */
