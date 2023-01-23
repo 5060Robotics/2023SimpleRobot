@@ -6,11 +6,8 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 import static frc.robot.Functions.*;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,10 +26,6 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private final PneumaticHub  testPneumaticHub = new PneumaticHub();
-  private final PowerDistribution testPowerDistrib = new PowerDistribution();
-
-  private final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
 
   /**
@@ -44,7 +37,6 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
     CameraServer.startAutomaticCapture();
 
   }
