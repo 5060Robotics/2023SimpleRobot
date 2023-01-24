@@ -32,9 +32,9 @@ public class Functions {
   static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
   // PERIPHERALS
-  private final PneumaticHub  testPneumaticHub = new PneumaticHub();
-  private final PowerDistribution testPowerDistrib = new PowerDistribution();
-  private final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
+  static private final PneumaticHub  testPneumaticHub = new PneumaticHub();
+  static private final PowerDistribution testPowerDistrib = new PowerDistribution();
+  static private final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
 
   /**
@@ -60,15 +60,29 @@ public class Functions {
    * Used mainly to clean up the code in Robot.java.
    * @param DriveMode The drive mode. 0 for arcade drive, 1 for tank drive,
    */
-  public static void Teleop_Drive(int DriveMode) 
+  public static void Teleop_Drive() 
   {
-    DRIVE_MOTORS.arcadeDrive(
-      MathUtil.applyDeadband(controller.getX(), 0.4) * -turnMultiplier, 
-      driveMultiplier * controller.getY());
+    if (controller.getRawButtonPressed(bind_CompressorOff)) {
+      if (_Compressor.isEnabled()) {_Compressor.disable();}
+      else {_Compressor.enableDigital();}
+    }
+
+
+
+    if (controller.getRawButton(bind_SlowMode)) {
+      DRIVE_MOTORS.arcadeDrive(
+      (MathUtil.applyDeadband(controller.getX(), deadBand) * turnMultiplier) * slowModeMultiplier_Turn, 
+      (MathUtil.applyDeadband(controller.getY(), deadBand) * driveMultiplier) * slowModeMultiplier_Drive
+      );
+    }
+    else {
+      DRIVE_MOTORS.arcadeDrive(
+      MathUtil.applyDeadband(controller.getX(), deadBand) * turnMultiplier, 
+      MathUtil.applyDeadband(controller.getY(), deadBand) * driveMultiplier
+      );
+    }
+    
   }
-    // if (DriveMode == 1) {
-    //   DRIVE_MOTORS.tankDrive(-turnMultiplier * controller.getX(), driveMultiplier * controller.getY());
-    // }
     
   }
 

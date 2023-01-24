@@ -6,6 +6,8 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 import static frc.robot.Functions.*;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -27,7 +29,8 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
-
+  private final DigitalInput _LimitSwitch = new DigitalInput(0);
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -96,7 +99,7 @@ public class Robot extends TimedRobot {
     if (controller.getRawButtonPressed(2)) {
       testSolenoid.set(Value.kReverse);
     }
-    Teleop_Drive(0);
+    Teleop_Drive();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -121,6 +124,9 @@ public class Robot extends TimedRobot {
     }
     if (controller.getRawButtonPressed(2)) {
       testSolenoid.set(Value.kReverse);
+    }
+    if (!_LimitSwitch.get()) {
+      testSolenoid.set(Value.kForward);
     }
     
   }
