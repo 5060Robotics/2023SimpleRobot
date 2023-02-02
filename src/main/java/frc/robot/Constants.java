@@ -1,18 +1,47 @@
 package frc.robot;
 
+import java.util.Map;
+
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * Class used to store all "magic numbers" so that we don't have to go across the 7 lands to change one number.
  * Also stores port numbers (hopefully).
  */
 public class Constants {
+    private static ShuffleboardTab controlTab = Shuffleboard.getTab("Controls");
+
+    static GenericEntry turnMultiplier = 
+    controlTab.addPersistent("Turn Multi", 0.575)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
+
+    static GenericEntry driveMultiplier = 
+    controlTab.addPersistent("Drive Multi", 0.9)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
+
+    static GenericEntry deadBand = 
+    controlTab.addPersistent("Deadband", 0.2)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 1)).getEntry();
+
+    static GenericEntry slowModeMultiplier_Drive = 
+    controlTab.addPersistent("Slow Drive Multi", 0.5)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
+
+    static GenericEntry slowModeMultiplier_Turn = 
+    controlTab.addPersistent("Slow Turn Multi", 0.8)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
+
+
     // Drive constants
-    static double turnMultiplier = 0.575;
-    static double driveMultiplier = 0.900;
-    static double deadBand = 0.2;
-    static double slowModeMultiplier_Drive = 0.5;
-    static double slowModeMultiplier_Turn = 0.8;
+    // static double turnMultiplier = 0.575;
+    // static double driveMultiplier = 0.900;
+    // static double deadBand = 0.2;
+    // static double slowModeMultiplier_Drive = 0.5;
+    // static double slowModeMultiplier_Turn = 0.8;
 
     // Ports
     static int port_LeftFrontMotor = 8;

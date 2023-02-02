@@ -33,8 +33,8 @@ public class Functions {
 
   // PERIPHERALS
   static private final PneumaticHub  testPneumaticHub = new PneumaticHub();
-  static private final PowerDistribution testPowerDistrib = new PowerDistribution();
-  static private final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
+  static private final PowerDistribution testPowerDistribution = new PowerDistribution();
+  static final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
 
   /**
@@ -58,27 +58,26 @@ public class Functions {
   /**
    * Drives all motors in the direction the joystick is pointed when called.
    * Used mainly to clean up the code in Robot.java.
-   * @param DriveMode The drive mode. 0 for arcade drive, 1 for tank drive,
    */
   public static void Teleop_Drive() 
   {
+    // Compressor toggle
     if (controller.getRawButtonPressed(bind_CompressorOff)) {
       if (_Compressor.isEnabled()) {_Compressor.disable();}
       else {_Compressor.enableDigital();}
     }
 
-
-
+    // Drive with slowmode
     if (controller.getRawButton(bind_SlowMode)) {
       DRIVE_MOTORS.arcadeDrive(
-      (MathUtil.applyDeadband(controller.getX(), deadBand) * turnMultiplier) * slowModeMultiplier_Turn, 
-      (MathUtil.applyDeadband(controller.getY(), deadBand) * driveMultiplier) * slowModeMultiplier_Drive
+      (MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2)) * turnMultiplier.getDouble(0.575)) * slowModeMultiplier_Turn.getDouble(0.8), 
+      (MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) * driveMultiplier.getDouble(0.9)) * slowModeMultiplier_Drive.getDouble(0.5)
       );
     }
     else {
       DRIVE_MOTORS.arcadeDrive(
-      MathUtil.applyDeadband(controller.getX(), deadBand) * turnMultiplier, 
-      MathUtil.applyDeadband(controller.getY(), deadBand) * driveMultiplier
+      MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2)) * turnMultiplier.getDouble(0.575), 
+      MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) * driveMultiplier.getDouble(0.9)
       );
     }
     
