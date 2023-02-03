@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class Constants {
     private static ShuffleboardTab controlTab = Shuffleboard.getTab("Controls");
+    private static ShuffleboardTab portTab = Shuffleboard.getTab("Ports");
+    private static ShuffleboardTab bindTab = Shuffleboard.getTab("Binds");
 
     static GenericEntry turnMultiplier = 
     controlTab.addPersistent("Turn Multi", 0.575)
