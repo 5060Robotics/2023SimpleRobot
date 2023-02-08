@@ -32,8 +32,8 @@ public class Functions {
   static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
   // PERIPHERALS
-  static private final PneumaticHub  testPneumaticHub = new PneumaticHub();
-  static private final PowerDistribution testPowerDistribution = new PowerDistribution();
+  private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
+  private static final PowerDistribution testPowerDistribution = new PowerDistribution();
   static final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
 
@@ -59,7 +59,7 @@ public class Functions {
    * Drives all motors in the direction the joystick is pointed when called.
    * Used mainly to clean up the code in Robot.java.
    */
-  public static void Teleop_Drive() 
+  public static void teleopDrive() 
   {
     // Compressor toggle
     if (controller.getRawButtonPressed(bind_CompressorOff)) {
@@ -80,8 +80,18 @@ public class Functions {
       MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) * driveMultiplier.getDouble(0.9)
       );
     }
-    
   }
-    
+
+  /**
+   * Clears all sticky faults (for the power distributor and pneumatics hub).
+   * Should only be used if you know why there are sticky faults, or if you don't care.
+   */
+  public static void clearAllStickyFaults()
+  {
+    testPneumaticHub.clearStickyFaults();
+    testPowerDistribution.clearStickyFaults();
+  }
+
+
   }
 

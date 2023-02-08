@@ -22,9 +22,6 @@ import edu.wpi.first.cameraserver.CameraServer;
  * project.
  */
 public class Robot extends TimedRobot {
-
-
-
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
   private final DigitalInput _LimitSwitch = new DigitalInput(0);
   
@@ -36,8 +33,6 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CameraServer.startAutomaticCapture();
     
-
-
   }
 
   /**
@@ -49,7 +44,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putBoolean("Compressor on?", _Compressor.isEnabled());
+    SmartDashboard.putBoolean("Compressor running?", _Compressor.isEnabled());
     SmartDashboard.putBoolean("Autonomous?", isAutonomous());
 
   }
@@ -75,7 +70,7 @@ public class Robot extends TimedRobot {
     if (controller.getRawButtonPressed(2)) {
       testSolenoid.set(Value.kReverse);
     }
-    Teleop_Drive();
+    teleopDrive();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -102,7 +97,7 @@ public class Robot extends TimedRobot {
       testSolenoid.set(Value.kReverse);
     }
     if (!_LimitSwitch.get()) {
-      testSolenoid.set(Value.kForward);
+      testSolenoid.toggle();;
     }
     
   }
