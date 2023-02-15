@@ -9,6 +9,7 @@ import static frc.robot.Functions.*;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -24,6 +25,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 public class Robot extends TimedRobot {
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
   private final DigitalInput _LimitSwitch = new DigitalInput(0);
+  // private final Encoder _Encoder = new Encoder(99, 99);
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -46,6 +48,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     SmartDashboard.putBoolean("Compressor running?", _Compressor.isEnabled());
     SmartDashboard.putBoolean("Autonomous?", isAutonomous());
+    SmartDashboard.putBoolean("Compressor enabled?", isCompressorOn());
 
   }
 
@@ -83,9 +86,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {
-
-  }
+  public void testInit() {}
 
   /** This function is called periodically during test mode. */
   @Override
@@ -97,16 +98,8 @@ public class Robot extends TimedRobot {
       testSolenoid.set(Value.kReverse);
     }
     if (!_LimitSwitch.get()) {
-      testSolenoid.toggle();;
+      testSolenoid.toggle();
     }
     
   }
-
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
-
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
 }

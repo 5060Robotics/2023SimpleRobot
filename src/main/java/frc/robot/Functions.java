@@ -18,7 +18,7 @@ import edu.wpi.first.math.MathUtil;
 
 
 /**
- * Class used to clean up functions from the main robot code.
+ * Class used to clean up functions and functional variables from the main robot code.
  */
 public class Functions {
   
@@ -29,13 +29,15 @@ public class Functions {
   private static final MotorController RIGHT_BACK_MOTOR_CONTROLLER = new VictorSP(port_RightBackMotor);
   private static final MotorControllerGroup LEFT_MOTOR_CONTROLLERS = new MotorControllerGroup(LEFT_FRONT_MOTOR_CONTROLLER, LEFT_BACK_MOTOR_CONTROLLER);
   private static final MotorControllerGroup RIGHT_MOTOR_CONTROLLERS = new MotorControllerGroup(RIGHT_FRONT_MOTOR_CONTROLLER, RIGHT_BACK_MOTOR_CONTROLLER);
-  static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
+  private static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
   // PERIPHERALS
   private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
   static final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
+  // FUNCTIONAL VARIABLES
+  private static boolean compressorEnabled = true;
 
   /**
    * Wait for a specified amount of milliseconds. Might cause unforeseen errors, so ONLY USE IN TEST MODE. 
@@ -43,8 +45,7 @@ public class Functions {
    * Does not seem to work anymore without a try/catch clause.
    * @param ms The amount of milliseconds to wait.
    */
-  public static void wait(int ms)
-  {
+  public static void wait(int ms) {
     try
     {
         Thread.sleep(ms);
@@ -59,8 +60,7 @@ public class Functions {
    * Drives all motors in the direction the joystick is pointed when called.
    * Used mainly to clean up the code in Robot.java.
    */
-  public static void teleopDrive() 
-  {
+  public static void teleopDrive() {
     // Compressor toggle
     if (controller.getRawButtonPressed(bind_CompressorOff)) {
       if (_Compressor.isEnabled()) {_Compressor.disable();}
@@ -86,12 +86,29 @@ public class Functions {
    * Clears all sticky faults (for the power distributor and pneumatics hub).
    * Should only be used if you know why there are sticky faults, or if you don't care.
    */
-  public static void clearAllStickyFaults()
-  {
+  public static void clearAllStickyFaults() {
     testPneumaticHub.clearStickyFaults();
     testPowerDistribution.clearStickyFaults();
   }
 
-
+  /**
+   * Toggles the automatic operation of the compressor (i.e. it turning on when psi is low).
+   * <p> Use to enable and disable the compressor so that the Shuffleboard readout is accurate.
+   */
+  public static void compressorToggle() {
+    if (_Compressor.isEnabled()) {_Compressor.disable(); compressorEnabled = false;}
+    else {_Compressor.enableDigital(); compressorEnabled = true;}
   }
+  
+  /** 
+   * Checks to see if the compressor is set to enable itself automatically when psi is low.
+   */
+  public static boolean isCompressorOn() {
+    return compressorEnabled;
+  }
+
+
+
+
+}
 
