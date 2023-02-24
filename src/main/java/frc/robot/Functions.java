@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 import edu.wpi.first.math.MathUtil;
+import java.lang.Math;
 
 
 // This file/class is intended to free Robot.java from a bunch of unnecessary functions.
@@ -31,6 +32,11 @@ public class Functions {
   private static final MotorControllerGroup RIGHT_MOTOR_CONTROLLERS = new MotorControllerGroup(RIGHT_FRONT_MOTOR_CONTROLLER, RIGHT_BACK_MOTOR_CONTROLLER);
   private static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
+  // RESERVED MOTORS
+  static final MotorController LEFT_ARM_MOTOR = new VictorSP(port_LeftArmMotor);
+  static final MotorController RIGHT_ARM_MOTOR = new VictorSP(port_RightArmMotor); // Not private so it can be inversed on initialization
+  // private static final MotorControllerGroup ARM_MOTORS = new MotorControllerGroup(LEFT_ARM_MOTOR, RIGHT_ARM_MOTOR);
+
   // PERIPHERALS
   private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
@@ -38,6 +44,7 @@ public class Functions {
 
   // FUNCTIONAL VARIABLES
   private static boolean compressorEnabled = true;
+  private static double totalArmSpeed = 0;
 
   /**
    * Wait for a specified amount of milliseconds. Might cause unforeseen errors, so ONLY USE IN TEST MODE. 
@@ -70,14 +77,20 @@ public class Functions {
     // Drive with slowmode
     if (controller.getRawButton(bind_SlowMode)) {
       DRIVE_MOTORS.arcadeDrive(
-      (MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2)) * turnMultiplier.getDouble(0.575)) * slowModeMultiplier_Turn.getDouble(0.8), 
-      (MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) * driveMultiplier.getDouble(0.9)) * slowModeMultiplier_Drive.getDouble(0.5)
+      (MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2))
+          * turnMultiplier.getDouble(0.575)) * slowModeMultiplier_Turn.getDouble(0.8), 
+
+      (MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) 
+          * driveMultiplier.getDouble(0.9)) * slowModeMultiplier_Drive.getDouble(0.5)
       );
     }
     else {
       DRIVE_MOTORS.arcadeDrive(
-      MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2)) * turnMultiplier.getDouble(0.575), 
-      MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) * driveMultiplier.getDouble(0.9)
+      MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2))
+          * turnMultiplier.getDouble(0.575), 
+
+      MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) 
+          * driveMultiplier.getDouble(0.9)
       );
     }
   }
@@ -107,8 +120,37 @@ public class Functions {
     return compressorEnabled;
   }
 
+  /**
+   * Function used to operate the arm in its entirety. 
+   * @param armDirection The direction the arm is going.
+   * @param speed The speed the motors drive at.
+   */
+  public static void operateArm(ArmDirections armDirection, double speed) {
+    // totalArmSpeed = Math.abs(LEFT_ARM_MOTOR.get()) + Math.abs(RIGHT_ARM_MOTOR.get());
+    if (true) { // add limit switch check
 
-
+      if (armDirection == ArmDirections.FORWARD) {
+        LEFT_ARM_MOTOR.set(speed);
+        RIGHT_ARM_MOTOR.set(speed);
+      }
+      switch(armDirection) {
+      case FORWARD:
+        LEFT_ARM_MOTOR.set(speed);
+        RIGHT_ARM_MOTOR.set(speed);
+      case BACK:
+        LEFT_ARM_MOTOR.set(-speed);
+        RIGHT_ARM_MOTOR.set(-speed);
+      case TOGGLE:
+        // figure out if this is necessary or needed
+      case OFF:
+        LEFT_ARM_MOTOR.set(0);
+        RIGHT_ARM_MOTOR.set(0);
+      }
+    //} else {
+      //LEFT_ARM_MOTOR.set(0);
+      //RIGHT_ARM_MOTOR.set(0);
+    }  
+  }
 
 }
 

@@ -7,9 +7,11 @@ package frc.robot;
 import static frc.robot.Constants.*;
 import static frc.robot.Functions.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -24,8 +26,10 @@ import edu.wpi.first.cameraserver.CameraServer;
  */
 public class Robot extends TimedRobot {
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
-  private final DigitalInput _LimitSwitch = new DigitalInput(0);
+  // private final DigitalInput _LimitSwitch = new DigitalInput(0);
   // private final Encoder _Encoder = new Encoder(99, 99);
+
+
   
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -34,7 +38,15 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     CameraServer.startAutomaticCapture();
+    RIGHT_ARM_MOTOR.setInverted(true);
     
+
+    
+    LocalDateTime currentTime = LocalDateTime.now();
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+    String formattedTime = currentTime.format(dateTimeFormatter);
+
+    SmartDashboard.putString("Build", formattedTime);
   }
 
   /**
@@ -70,7 +82,7 @@ public class Robot extends TimedRobot {
     if (controller.getRawButtonPressed(4)) {
       testSolenoid.set(Value.kForward);
     }
-    if (controller.getRawButtonPressed(2)) {
+    else if (controller.getRawButtonPressed(2)) {
       testSolenoid.set(Value.kReverse);
     }
     teleopDrive();
@@ -91,15 +103,14 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    if (controller.getRawButtonPressed(4)) {
-      testSolenoid.set(Value.kForward);
+    if (controller.getRawButtonPressed(bind_ArmForward)) {
+      operateArm(ArmDirections.FORWARD, 0.25);
     }
-    if (controller.getRawButtonPressed(2)) {
-      testSolenoid.set(Value.kReverse);
+    else if (controller.getRawButtonPressed(bind_ArmBack)) {
+      operateArm(ArmDirections.BACK, armMotorSpeed.getDouble(0.25));
     }
-    if (!_LimitSwitch.get()) {
-      testSolenoid.toggle();
+    else if (controller.getRawButtonPressed(bind_ArmOff)) {
+      operateArm(ArmDirections.OFF, armMotorSpeed.getDouble(0.25));
     }
-    
   }
 }
