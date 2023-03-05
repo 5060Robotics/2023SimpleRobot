@@ -44,7 +44,6 @@ public class Constants {
     static int port_RightBackMotor = 6;
 
     static int port_ArmPivotMotor = 1;
-    static int port_RightArmMotor = 0;
 
     static int port_DoubleSolenoidForward1 = 0;
     static int port_DoubleSolenoidBack1 = 0;
@@ -59,5 +58,9 @@ public class Constants {
     static int bind_ArmOff = 10;
 
     // FUNCTIONAL VARIABLES
-
+    enum autoMode {
+        DEFAULT,
+        TIMED_DRIVE,
+        STAY_IN_PLACE,
+    }
 }

@@ -2,6 +2,9 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 
+import java.util.ArrayList;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -11,7 +14,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
-import edu.wpi.first.math.MathUtil;
+import frc.robot.Constants.autoMode;
 
 // This file/class is intended to free Robot.java from a bunch of unnecessary functions.
 
@@ -37,7 +40,7 @@ public class Functions {
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
   static final Compressor _compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
-  // FUNCTIONAL VARIABLES
+  // FUNCTIONAL VARIABLES (that i don't want to put in constants)
   static Timer autoTimer = new Timer();
   private static boolean compressorEnabled = true;
 
@@ -73,12 +76,19 @@ public class Functions {
 
   /**
    * Controls the robot during auto.
+   * @param aMode The selected auto mode.
    */
-  public static void autoDrive() {
-    if (autoTimer.get() < 5) {
-    DRIVE_MOTORS.arcadeDrive(0.35, 0);
-    } else {
-    DRIVE_MOTORS.stopMotor();
+  public static void autoDrive(autoMode aMode) {
+    if (aMode == autoMode.DEFAULT || aMode == autoMode.TIMED_DRIVE ) {
+      if (autoTimer.get() < 5) {
+        DRIVE_MOTORS.arcadeDrive(0.35, 0);
+      } else {
+        DRIVE_MOTORS.stopMotor();
+      }
+    }
+    
+    if (aMode == autoMode.STAY_IN_PLACE) {
+      // Do nothing
     }
   }
 
@@ -107,5 +117,26 @@ public class Functions {
     return compressorEnabled;
   }
 
+  public static boolean testMotors(double testSpeed, double testTolerableDifference) {
+    ArrayList<MotorController> motors = new ArrayList<MotorController>();
+
+    motors.add(LEFT_FRONT_MOTOR_CONTROLLER);
+    motors.add(LEFT_BACK_MOTOR_CONTROLLER);
+    motors.add(RIGHT_FRONT_MOTOR_CONTROLLER);
+    motors.add(RIGHT_BACK_MOTOR_CONTROLLER);
+    motors.add(ARM_PIVOT_MOTOR);
+
+    for (int i = 0; i < motors.size(); i++) {
+      motors.get(i).set(testSpeed);
+      double speed = motors.get(i).get();
+      if (speed > (speed + testTolerableDifference) || speed < (speed - testTolerableDifference)) {
+        motors.get(i).set(0);
+        throw new RuntimeException("Motor number " + i + " failed during testing");
+      }
+      motors.get(i).set(0);
+    }
+
+    return true;
+  }
 }
 
