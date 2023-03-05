@@ -124,7 +124,7 @@ public class Functions {
     motors.add(LEFT_BACK_MOTOR_CONTROLLER);
     motors.add(RIGHT_FRONT_MOTOR_CONTROLLER);
     motors.add(RIGHT_BACK_MOTOR_CONTROLLER);
-    motors.add(ARM_PIVOT_MOTOR);
+    // motors.add(ARM_PIVOT_MOTOR);
 
     for (int i = 0; i < motors.size(); i++) {
       motors.get(i).set(testSpeed);

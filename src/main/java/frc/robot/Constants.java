@@ -38,12 +38,12 @@ public class Constants {
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
 
     // PORTS
-    static int port_LeftFrontMotor = 8;
-    static int port_LeftBackMotor = 9;
-    static int port_RightFrontMotor = 7;
-    static int port_RightBackMotor = 6;
+    static int port_LeftFrontMotor = 1;
+    static int port_LeftBackMotor = 0;
+    static int port_RightFrontMotor = 2;
+    static int port_RightBackMotor = 3;
 
-    static int port_ArmPivotMotor = 1;
+    static int port_ArmPivotMotor = 12;
 
     static int port_DoubleSolenoidForward1 = 0;
     static int port_DoubleSolenoidBack1 = 0;
