@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -23,7 +24,7 @@ import java.lang.Math;
  */
 public class Functions {
   
-  // MOTORS
+  // DRIVE MOTORS
   private static final MotorController LEFT_FRONT_MOTOR_CONTROLLER = new VictorSP(port_LeftFrontMotor);
   private static final MotorController LEFT_BACK_MOTOR_CONTROLLER = new VictorSP(port_LeftBackMotor);
   private static final MotorController RIGHT_FRONT_MOTOR_CONTROLLER = new VictorSP(port_RightFrontMotor);
@@ -32,17 +33,17 @@ public class Functions {
   private static final MotorControllerGroup RIGHT_MOTOR_CONTROLLERS = new MotorControllerGroup(RIGHT_FRONT_MOTOR_CONTROLLER, RIGHT_BACK_MOTOR_CONTROLLER);
   private static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
-  // RESERVED MOTORS
+  // PERIPHERAL MOTORS
   static final MotorController LEFT_ARM_MOTOR = new VictorSP(port_LeftArmMotor);
   static final MotorController RIGHT_ARM_MOTOR = new VictorSP(port_RightArmMotor); // Not private so it can be inversed on initialization
-  // private static final MotorControllerGroup ARM_MOTORS = new MotorControllerGroup(LEFT_ARM_MOTOR, RIGHT_ARM_MOTOR);
 
-  // PERIPHERALS
+  // MISC PERIPHERALS
   private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
   static final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
   // FUNCTIONAL VARIABLES
+  static Timer autoTimer = new Timer();
   private static boolean compressorEnabled = true;
   private static double totalArmSpeed = 0;
 
@@ -53,13 +54,11 @@ public class Functions {
    * @param ms The amount of milliseconds to wait.
    */
   public static void wait(int ms) {
-    try
-    {
-        Thread.sleep(ms);
+    try {
+      Thread.sleep(ms);
     }
-    catch(InterruptedException ex)
-    {
-        Thread.currentThread().interrupt();
+    catch(InterruptedException ex) {
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -69,9 +68,8 @@ public class Functions {
    */
   public static void teleopDrive() {
     // Compressor toggle
-    if (controller.getRawButtonPressed(bind_CompressorOff)) {
-      if (_Compressor.isEnabled()) {_Compressor.disable();}
-      else {_Compressor.enableDigital();}
+    if (controller.getRawButtonPressed(bind_CompressorToggle)) {
+      compressorToggle();
     }
 
     // Drive with slowmode
@@ -83,8 +81,7 @@ public class Functions {
       (MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) 
           * driveMultiplier.getDouble(0.9)) * slowModeMultiplier_Drive.getDouble(0.5)
       );
-    }
-    else {
+    } else {
       DRIVE_MOTORS.arcadeDrive(
       MathUtil.applyDeadband(controller.getX(), deadBand.getDouble(0.2))
           * turnMultiplier.getDouble(0.575), 
@@ -92,6 +89,17 @@ public class Functions {
       MathUtil.applyDeadband(controller.getY(), deadBand.getDouble(0.2)) 
           * driveMultiplier.getDouble(0.9)
       );
+    }
+  }
+
+  /**
+   * Controls the robot during auto.
+   */
+  public static void autoDrive() {
+    if (autoTimer.get() < 5) {
+    DRIVE_MOTORS.arcadeDrive(0.35, 0);
+    } else {
+    DRIVE_MOTORS.stopMotor();
     }
   }
 
@@ -126,29 +134,25 @@ public class Functions {
    * @param speed The speed the motors drive at.
    */
   public static void operateArm(ArmDirections armDirection, double speed) {
-    // totalArmSpeed = Math.abs(LEFT_ARM_MOTOR.get()) + Math.abs(RIGHT_ARM_MOTOR.get());
-    if (true) { // add limit switch check
-
-      if (armDirection == ArmDirections.FORWARD) {
-        LEFT_ARM_MOTOR.set(speed);
-        RIGHT_ARM_MOTOR.set(speed);
-      }
+    totalArmSpeed = Math.abs(LEFT_ARM_MOTOR.get()) + Math.abs(RIGHT_ARM_MOTOR.get());
+    if (totalArmSpeed == 0) { // add limit switch check
       switch(armDirection) {
       case FORWARD:
         LEFT_ARM_MOTOR.set(speed);
         RIGHT_ARM_MOTOR.set(speed);
+        break;
       case BACK:
         LEFT_ARM_MOTOR.set(-speed);
         RIGHT_ARM_MOTOR.set(-speed);
-      case TOGGLE:
-        // figure out if this is necessary or needed
+        break;
       case OFF:
         LEFT_ARM_MOTOR.set(0);
         RIGHT_ARM_MOTOR.set(0);
+        break;
       }
-    //} else {
-      //LEFT_ARM_MOTOR.set(0);
-      //RIGHT_ARM_MOTOR.set(0);
+    } else {
+      LEFT_ARM_MOTOR.set(0);
+      RIGHT_ARM_MOTOR.set(0);
     }  
   }
 

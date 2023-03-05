@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  */
 public class Constants {
     private static ShuffleboardTab controlTab = Shuffleboard.getTab("Controls");
-    // private static ShuffleboardTab portTab = Shuffleboard.getTab("Ports");
-    // private static ShuffleboardTab bindTab = Shuffleboard.getTab("Binds");
 
     // CONTROLS
     static GenericEntry turnMultiplier = 
@@ -65,7 +63,7 @@ public class Constants {
     // BINDS 
     static final Joystick controller = new Joystick(0);
     static int bind_SlowMode = 7;
-    static int bind_CompressorOff = 9;
+    static int bind_CompressorToggle = 9;
     static int bind_ArmForward = 6;
     static int bind_ArmBack = 8;
     static int bind_ArmToggle = 0;
@@ -75,7 +73,6 @@ public class Constants {
     enum ArmDirections {
         FORWARD,
         BACK,
-        TOGGLE,
         OFF
     }
 }

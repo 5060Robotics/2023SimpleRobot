@@ -26,9 +26,10 @@ import edu.wpi.first.cameraserver.CameraServer;
  */
 public class Robot extends TimedRobot {
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
-  // private final DigitalInput _LimitSwitch = new DigitalInput(0);
-  // private final Encoder _Encoder = new Encoder(99, 99);
 
+  @SuppressWarnings("unused")
+  private final DigitalInput _LimitSwitch = new DigitalInput(0);
+  private final DigitalInput _LimitSwitch2 = new DigitalInput(1);
 
   
   /**
@@ -40,10 +41,8 @@ public class Robot extends TimedRobot {
     CameraServer.startAutomaticCapture();
     RIGHT_ARM_MOTOR.setInverted(true);
     
-
-    
     LocalDateTime currentTime = LocalDateTime.now();
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm");
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a");
     String formattedTime = currentTime.format(dateTimeFormatter);
 
     SmartDashboard.putString("Build", formattedTime);
@@ -104,13 +103,16 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     if (controller.getRawButtonPressed(bind_ArmForward)) {
-      operateArm(ArmDirections.FORWARD, 0.25);
+      operateArm(ArmDirections.FORWARD, armMotorSpeed.getDouble(0.25));
     }
     else if (controller.getRawButtonPressed(bind_ArmBack)) {
       operateArm(ArmDirections.BACK, armMotorSpeed.getDouble(0.25));
     }
     else if (controller.getRawButtonPressed(bind_ArmOff)) {
-      operateArm(ArmDirections.OFF, armMotorSpeed.getDouble(0.25));
+      operateArm(ArmDirections.OFF, 0);
+    }
+    if (!_LimitSwitch2.get()) {
+      teleopDrive(); // this is mostly just to test if the robot works in test mode
     }
   }
 }
