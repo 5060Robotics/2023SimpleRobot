@@ -37,24 +37,13 @@ public class Constants {
     controlTab.addPersistent("Slow Turn Multi", 0.8)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
 
-    static GenericEntry armMotorSpeed = 
-    controlTab.addPersistent("Arm Motor Speed", 0.25)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0, "max", 1)).getEntry();
-
-    // DRIVE CONSTANTS
-    // static double turnMultiplier = 0.575;
-    // static double driveMultiplier = 0.900;
-    // static double deadBand = 0.2;
-    // static double slowModeMultiplier_Drive = 0.5;
-    // static double slowModeMultiplier_Turn = 0.8;
-
     // PORTS
     static int port_LeftFrontMotor = 8;
     static int port_LeftBackMotor = 9;
     static int port_RightFrontMotor = 7;
     static int port_RightBackMotor = 6;
 
-    static int port_LeftArmMotor = 1;
+    static int port_ArmPivotMotor = 1;
     static int port_RightArmMotor = 0;
 
     static int port_DoubleSolenoidForward1 = 0;
@@ -70,9 +59,5 @@ public class Constants {
     static int bind_ArmOff = 10;
 
     // FUNCTIONAL VARIABLES
-    enum ArmDirections {
-        FORWARD,
-        BACK,
-        OFF
-    }
+
 }

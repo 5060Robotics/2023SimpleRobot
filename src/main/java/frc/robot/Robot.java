@@ -39,7 +39,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     CameraServer.startAutomaticCapture();
-    RIGHT_ARM_MOTOR.setInverted(true);
     
     LocalDateTime currentTime = LocalDateTime.now();
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a");
@@ -57,7 +56,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putBoolean("Compressor running?", _Compressor.isEnabled());
+    SmartDashboard.putBoolean("Compressor running?", _compressor.isEnabled());
     SmartDashboard.putBoolean("Autonomous?", isAutonomous());
     SmartDashboard.putBoolean("Compressor enabled?", isCompressorOn());
 
@@ -102,15 +101,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    if (controller.getRawButtonPressed(bind_ArmForward)) {
-      operateArm(ArmDirections.FORWARD, armMotorSpeed.getDouble(0.25));
-    }
-    else if (controller.getRawButtonPressed(bind_ArmBack)) {
-      operateArm(ArmDirections.BACK, armMotorSpeed.getDouble(0.25));
-    }
-    else if (controller.getRawButtonPressed(bind_ArmOff)) {
-      operateArm(ArmDirections.OFF, 0);
-    }
     if (!_LimitSwitch2.get()) {
       teleopDrive(); // this is mostly just to test if the robot works in test mode
     }

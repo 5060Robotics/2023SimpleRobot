@@ -12,12 +12,8 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 import edu.wpi.first.math.MathUtil;
-import java.lang.Math;
-
 
 // This file/class is intended to free Robot.java from a bunch of unnecessary functions.
-// Imports in Java are kinda weird I think so this may not work. 
-
 
 /**
  * Class used to clean up functions and functional variables from the main robot code.
@@ -34,33 +30,16 @@ public class Functions {
   private static final DifferentialDrive DRIVE_MOTORS = new DifferentialDrive(LEFT_MOTOR_CONTROLLERS, RIGHT_MOTOR_CONTROLLERS);
 
   // PERIPHERAL MOTORS
-  static final MotorController LEFT_ARM_MOTOR = new VictorSP(port_LeftArmMotor);
-  static final MotorController RIGHT_ARM_MOTOR = new VictorSP(port_RightArmMotor); // Not private so it can be inversed on initialization
+  static final MotorController ARM_PIVOT_MOTOR = new VictorSP(port_ArmPivotMotor);
 
   // MISC PERIPHERALS
   private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
-  static final Compressor _Compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
+  static final Compressor _compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
 
   // FUNCTIONAL VARIABLES
   static Timer autoTimer = new Timer();
   private static boolean compressorEnabled = true;
-  private static double totalArmSpeed = 0;
-
-  /**
-   * Wait for a specified amount of milliseconds. Might cause unforeseen errors, so ONLY USE IN TEST MODE. 
-   * Also probably not a good idea to use it in periodic mode for anything.
-   * Does not seem to work anymore without a try/catch clause.
-   * @param ms The amount of milliseconds to wait.
-   */
-  public static void wait(int ms) {
-    try {
-      Thread.sleep(ms);
-    }
-    catch(InterruptedException ex) {
-      Thread.currentThread().interrupt();
-    }
-  }
 
   /**
    * Drives all motors in the direction the joystick is pointed when called.
@@ -117,8 +96,8 @@ public class Functions {
    * <p> Use to enable and disable the compressor so that the Shuffleboard readout is accurate.
    */
   public static void compressorToggle() {
-    if (_Compressor.isEnabled()) {_Compressor.disable(); compressorEnabled = false;}
-    else {_Compressor.enableDigital(); compressorEnabled = true;}
+    if (_compressor.isEnabled()) {_compressor.disable(); compressorEnabled = false;}
+    else {_compressor.enableDigital(); compressorEnabled = true;}
   }
   
   /** 
@@ -126,34 +105,6 @@ public class Functions {
    */
   public static boolean isCompressorOn() {
     return compressorEnabled;
-  }
-
-  /**
-   * Function used to operate the arm in its entirety. 
-   * @param armDirection The direction the arm is going.
-   * @param speed The speed the motors drive at.
-   */
-  public static void operateArm(ArmDirections armDirection, double speed) {
-    totalArmSpeed = Math.abs(LEFT_ARM_MOTOR.get()) + Math.abs(RIGHT_ARM_MOTOR.get());
-    if (totalArmSpeed == 0) { // add limit switch check
-      switch(armDirection) {
-      case FORWARD:
-        LEFT_ARM_MOTOR.set(speed);
-        RIGHT_ARM_MOTOR.set(speed);
-        break;
-      case BACK:
-        LEFT_ARM_MOTOR.set(-speed);
-        RIGHT_ARM_MOTOR.set(-speed);
-        break;
-      case OFF:
-        LEFT_ARM_MOTOR.set(0);
-        RIGHT_ARM_MOTOR.set(0);
-        break;
-      }
-    } else {
-      LEFT_ARM_MOTOR.set(0);
-      RIGHT_ARM_MOTOR.set(0);
-    }  
   }
 
 }
