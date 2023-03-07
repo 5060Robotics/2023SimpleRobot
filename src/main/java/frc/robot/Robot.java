@@ -24,6 +24,7 @@ import edu.wpi.first.cameraserver.CameraServer;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
+
 public class Robot extends TimedRobot {
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
 
@@ -40,6 +41,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     CameraServer.startAutomaticCapture();
     
+    // Janky solution for trying to find out what code is deployed - doesn't work too well.
     LocalDateTime currentTime = LocalDateTime.now();
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a");
     String formattedTime = currentTime.format(dateTimeFormatter);
@@ -79,12 +81,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
-    if (controller.getRawButtonPressed(4)) {
+    if (controller.getRawButtonPressed(port_SolenoidForward)) {
       testSolenoid.set(Value.kForward);
     }
-    else if (controller.getRawButtonPressed(2)) {
+    else if (controller.getRawButtonPressed(port_SolenoidBack)) {
       testSolenoid.set(Value.kReverse);
     }
+    pivotArm(armPivotSpeed.getDouble(0.2));
     teleopDrive();
   }
 
