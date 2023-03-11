@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * Class used to store all "magic numbers" so that we don't have to go across the 7 lands to change one number.
@@ -41,6 +42,10 @@ public class Constants {
     controlTab.addPersistent("Arm Pivot Speed", 0.2)
     .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", 0.1, "max", 1)).getEntry();
 
+    static SendableChooser<autoMode> autoChooser = new SendableChooser<>();
+    // static GenericEntry autoModeChooser = 
+    // controlTab.add()
+
 
     // PORTS
     static int port_LeftFrontMotor = 1;
@@ -56,7 +61,7 @@ public class Constants {
     // BINDS 
     static final Joystick controller = new Joystick(0);
     static int bind_SlowMode = 7;
-    static int bind_CompressorToggle = 90;
+    static int bind_CompressorToggle = 9;
     static int bind_ArmUp = 6;
     static int bind_ArmDown = 8;
     static int bind_ArmToggle = 0;
@@ -65,7 +70,12 @@ public class Constants {
     // FUNCTIONAL VARIABLES
     enum autoMode {
         DEFAULT,
-        TIMED_DRIVE,
+        TIMED_DRIVE_3_SECONDS,
+        TIMED_DRIVE_5_SECONDS,
+        TIMED_DRIVE_7_SECONDS,
         STAY_IN_PLACE,
+        SCORE_AND_DRIVE,
+        FOR_MIDDLE,
+        
     }
 }

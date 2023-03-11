@@ -10,7 +10,6 @@ import static frc.robot.Functions.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -26,13 +25,7 @@ import edu.wpi.first.cameraserver.CameraServer;
  */
 
 public class Robot extends TimedRobot {
-  private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
 
-  @SuppressWarnings("unused")
-  private final DigitalInput _LimitSwitch = new DigitalInput(0);
-  private final DigitalInput _LimitSwitch2 = new DigitalInput(1);
-
-  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -40,6 +33,17 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture();
+
+    autoChooser.setDefaultOption("Default", autoMode.DEFAULT);
+    autoChooser.addOption("Timed Drive (3 seconds)", autoMode.TIMED_DRIVE_3_SECONDS);
+    autoChooser.addOption("Timed Drive (5 seconds)", autoMode.TIMED_DRIVE_5_SECONDS);
+    autoChooser.addOption("Timed Drive (7 seconds)", autoMode.TIMED_DRIVE_7_SECONDS);
+    autoChooser.addOption("Stay in Place", autoMode.STAY_IN_PLACE);
+    autoChooser.addOption("Score and Drive Backwards", autoMode.SCORE_AND_DRIVE);
+    autoChooser.addOption("middle", autoMode.FOR_MIDDLE);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
     
     // Janky solution for trying to find out what code is deployed - doesn't work too well.
     LocalDateTime currentTime = LocalDateTime.now();
@@ -65,12 +69,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    autoStart = false;
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    autoDrive(autoMode.DEFAULT);
+    autoDrive(autoChooser.getSelected());
   }
 
   /** This function is called once when teleop is enabled. */
@@ -81,14 +87,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
-    if (controller.getRawButtonPressed(port_SolenoidForward)) {
-      testSolenoid.set(Value.kForward);
-    }
-    else if (controller.getRawButtonPressed(port_SolenoidBack)) {
-      testSolenoid.set(Value.kReverse);
+    if (controller.getRawButtonPressed(port_SolenoidBack) ) {
+      if (armSolenoid.get() == Value.kOff) {
+        armSolenoid.set(Value.kForward);
+      } else {
+        armSolenoid.toggle();
+      }
     }
     pivotArm(armPivotSpeed.getDouble(0.2));
     teleopDrive();
+
   }
 
   /** This function is called once when the robot is disabled. */
@@ -101,13 +109,13 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    ARM_PIVOT_MOTOR.set(0.2);
+  }
 
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {
-    if (!_LimitSwitch2.get()) {
-      teleopDrive(); // this is mostly just to test if the robot works in test mode
-    }
+
   }
 }

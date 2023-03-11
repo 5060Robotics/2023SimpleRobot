@@ -1,11 +1,29 @@
 package frc.robot;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.bind_ArmDown;
+import static frc.robot.Constants.bind_ArmStop;
+import static frc.robot.Constants.bind_ArmUp;
+import static frc.robot.Constants.bind_CompressorToggle;
+import static frc.robot.Constants.bind_SlowMode;
+import static frc.robot.Constants.controller;
+import static frc.robot.Constants.deadBand;
+import static frc.robot.Constants.driveMultiplier;
+import static frc.robot.Constants.port_ArmPivotMotor;
+import static frc.robot.Constants.port_LeftBackMotor;
+import static frc.robot.Constants.port_LeftFrontMotor;
+import static frc.robot.Constants.port_RightBackMotor;
+import static frc.robot.Constants.port_RightFrontMotor;
+import static frc.robot.Constants.slowModeMultiplier_Drive;
+import static frc.robot.Constants.slowModeMultiplier_Turn;
+import static frc.robot.Constants.turnMultiplier;
 
 import java.util.ArrayList;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -39,10 +57,14 @@ public class Functions {
   private static final PneumaticHub  testPneumaticHub = new PneumaticHub();
   private static final PowerDistribution testPowerDistribution = new PowerDistribution();
   static final Compressor _compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
+  public static final DoubleSolenoid armSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 7);
+  private static final DigitalInput LimitSwitch = new DigitalInput(0);
 
   // FUNCTIONAL VARIABLES (that i don't want to put in constants)
   private static boolean compressorEnabled = true;
+  public static boolean autoStart = false;
   private static Timer armTimer = new Timer();
+  private static Timer autoTimer = new Timer();
 
 
   /**
@@ -84,19 +106,71 @@ public class Functions {
    * @param aMode The selected auto mode.
    */
   public static void autoDrive(autoMode aMode) {
-    Timer autoTimer = new Timer();
-    if (aMode == autoMode.DEFAULT || aMode == autoMode.TIMED_DRIVE ) {
-      if (autoTimer.get() < 5) {
-        DRIVE_MOTORS.arcadeDrive(0.35, 0);
+    if (!autoStart) {
+      autoTimer.reset();
+      autoTimer.start();
+      autoStart = true;
+    }
+    if (aMode == autoMode.TIMED_DRIVE_3_SECONDS) {
+      if (autoTimer.get() < 3) {
+        DRIVE_MOTORS.tankDrive(0.65, -0.65);
       } else {
         DRIVE_MOTORS.stopMotor();
       }
     }
-    
+    if (aMode == autoMode.DEFAULT || aMode == autoMode.TIMED_DRIVE_5_SECONDS) {
+      if (autoTimer.get() < 5) {
+        DRIVE_MOTORS.tankDrive(0.65, -0.65);
+      } else {
+        DRIVE_MOTORS.stopMotor();
+      }
+    }
+    if (aMode == autoMode.TIMED_DRIVE_7_SECONDS) {
+      if (autoTimer.get() < 7) {
+        DRIVE_MOTORS.tankDrive(0.65, -0.65);
+      } else {
+        DRIVE_MOTORS.stopMotor();
+      }
+    }
     if (aMode == autoMode.STAY_IN_PLACE) {
       // Do nothing
+      if (autoTimer.get() < 2) {
+        DRIVE_MOTORS.tankDrive(0.35, 0.35);
+      } 
+    }
+    if (aMode == autoMode.SCORE_AND_DRIVE) {
+      if (autoTimer.get() < 2) {
+        ARM_PIVOT_MOTOR.set(0.2);
+      } else if (autoTimer.get() < 3) {
+        armSolenoid.set(Value.kForward);
+        ARM_PIVOT_MOTOR.set(0.05);
+      } else if (autoTimer.get() < 7) {
+        ARM_PIVOT_MOTOR.stopMotor();
+        DRIVE_MOTORS.tankDrive(-0.65, 0.65);
+      } else if (autoTimer.get() < 9) {
+        DRIVE_MOTORS.tankDrive(0.35, 0.35);
+      } else {
+        DRIVE_MOTORS.stopMotor();
+      }
+    }
+    if (aMode == autoMode.FOR_MIDDLE) {
+      if (autoTimer.get() < 2) {
+        ARM_PIVOT_MOTOR.set(0.2);
+      } else if (autoTimer.get() < 3) {
+        armSolenoid.set(Value.kForward);
+        ARM_PIVOT_MOTOR.set(0.05);
+      } else if (autoTimer.get() < 7.4) {
+        ARM_PIVOT_MOTOR.stopMotor();
+        DRIVE_MOTORS.tankDrive(-0.65, 0.65);
+      } else if (autoTimer.get() < 10.6) {
+        ARM_PIVOT_MOTOR.stopMotor();
+        DRIVE_MOTORS.tankDrive(0.65, -0.65);
+      } else {
+        DRIVE_MOTORS.stopMotor();
+      }
     }
   }
+
 
   /**
    * Clears all sticky faults (for the power distributor and pneumatics hub).
@@ -150,7 +224,7 @@ public class Functions {
 
       // If motors are not set close to the speed we set them to, throw an error
       if (actualSpeed > (actualSpeed + testTolerableDifference) || actualSpeed < (actualSpeed - testTolerableDifference)) {
-        motors.get(i).set(0);
+        motors.get(i).stopMotor();
         throw new RuntimeException("Motor number " + i + " failed during testing");
       }
       motors.get(i).set(0);
@@ -165,21 +239,24 @@ public class Functions {
    */
   public static void pivotArm(double speed) {
     if (controller.getRawButtonPressed(bind_ArmUp)) {
-      armTimer.reset();
-      armTimer.start();
-      ARM_PIVOT_MOTOR.set(speed);
+      if (LimitSwitch.get()) {
+        ARM_PIVOT_MOTOR.set(speed);
+      }
     }
     else if (controller.getRawButtonPressed(bind_ArmDown)) {
-      armTimer.reset();
-      armTimer.start();
-      ARM_PIVOT_MOTOR.set(speed);
+      ARM_PIVOT_MOTOR.set(0.02);
+    }
+    if (controller.getRawButtonReleased(bind_ArmDown) || controller.getRawButtonReleased(bind_ArmUp)) {
+      ARM_PIVOT_MOTOR.set(0.05);
+    }
+    if (!LimitSwitch.get() && ARM_PIVOT_MOTOR.get() > 0.03) {
+      ARM_PIVOT_MOTOR.set(0.05);
     }
     if (controller.getRawButtonPressed(bind_ArmStop)) {
-      ARM_PIVOT_MOTOR.stopMotor();
+      ARM_PIVOT_MOTOR.set(-speed);
     }
-    if (armTimer.get() > 1) {
+    if (controller.getRawButtonReleased(bind_ArmStop)) {
       ARM_PIVOT_MOTOR.stopMotor();
-      armTimer.reset();
     }
   }
 }
